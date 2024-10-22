@@ -1,0 +1,76 @@
+name: Develop Workflow
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  lint:
+    runs-on: self-hosted
+    name: PHP Lint
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: PHP Lint
+        run: |
+          find . -name "*.php" -print0 | xargs -0 -n1 php -l
+
+  build:
+    runs-on: self-hosted
+    needs: lint
+    name: Build Docker Image
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker Image
+        run: |
+          docker build -t your-docker-image .
+
+  push:
+    runs-on: self-hosted
+    needs: build
+    name: Push to DockerHub
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to DockerHub
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+
+      - name: Push Docker Image
+        run: docker push your-docker-image
+
+  deploy:
+    runs-on: self-hosted
+    needs: push
+    name: Deploy to Server
+    steps:
+      - name: SSH to Server and Deploy
+        run: |
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} user@your-server-ip << 'EOF'
+          docker pull your-docker-image
+          docker-compose up -d
+          EOF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
