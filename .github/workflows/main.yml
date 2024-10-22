@@ -7,7 +7,7 @@ on:
 
 jobs:
   lint:
-    
+
     runs-on: self-hosted
     name: PHP Lint
     steps:
@@ -17,7 +17,9 @@ jobs:
 
       - name: PHP Lint
         run: |
-          find . -name "*.php" -print0 | xargs -0 -n1 php -l
+          for file in $(find . -name "*.php"); do
+            php -l "$file"
+          done
 
 
   build:
