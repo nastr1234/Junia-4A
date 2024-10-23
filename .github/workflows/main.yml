@@ -7,20 +7,17 @@ on:
 
 jobs:
   lint:
-
     runs-on: self-hosted
     name: PHP Lint
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-
       - name: PHP Lint
         run: |
           for file in $(find . -name "*.php"); do
             php -l "$file"
           done
-
 
   build:
     runs-on: self-hosted
@@ -32,23 +29,21 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t your-docker-image /var/www/html
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/your-docker-image:latest /var/www/html
 
   push:
-  runs-on: self-hosted
-  needs: build
-  name: Push to DockerHub
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+    runs-on: self-hosted
+    needs: build
+    name: Push to DockerHub
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Log in to DockerHub
-      run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+      - name: Log in to DockerHub
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-    - name: Build and Push Docker Image
-      run: |
-        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/your-docker-image:latest /var/www/html
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/your-docker-image:latest
+      - name: Push Docker Image
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/your-docker-image:latest
 
   deploy:
     runs-on: self-hosted
@@ -58,9 +53,72 @@ jobs:
       - name: SSH to Server and Deploy
         run: |
           ssh -i ${{ secrets.SSH_PRIVATE_KEY }} user@your-server-ip << 'EOF'
-          docker pull your-docker-image
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/your-docker-image:latest
           docker-compose up -d
           EOF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
