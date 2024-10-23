@@ -52,7 +52,7 @@ jobs:
     steps:
       - name: SSH to Server and Deploy
         run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} nastr1234@your-server-ip << 'EOF'
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} nastr1234@localhost << 'EOF'
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/your-docker-image:latest
           docker-compose up -d
           EOF
