@@ -35,18 +35,20 @@ jobs:
           docker build -t your-docker-image /var/www/html
 
   push:
-    runs-on: self-hosted
-    needs: build
-    name: Push to DockerHub
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+  runs-on: self-hosted
+  needs: build
+  name: Push to DockerHub
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Log in to DockerHub
-        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+    - name: Log in to DockerHub
+      run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Push Docker Image
-        run: docker push your-docker-image
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/your-docker-image:latest /var/www/html
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/your-docker-image:latest
 
   deploy:
     runs-on: self-hosted
